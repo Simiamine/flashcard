@@ -75,6 +75,17 @@
       margin-bottom: 36px;
     }
 
+    .deck-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
     .field-group {
       margin-bottom: 16px;
     }
@@ -123,7 +134,7 @@
       white-space: nowrap;
     }
     .btn:active { transform: scale(.98); }
-    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transition: opacity .2s; }
 
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
@@ -394,7 +405,7 @@
     .flashcard {
       position: relative;
       width: 100%;
-      min-height: 260px;
+      min-height: 300px;
       transform-style: preserve-3d;
       transition: transform .45s cubic-bezier(.4,0,.2,1);
       cursor: pointer;
@@ -420,8 +431,6 @@
 
     .flashcard-face.back {
       transform: rotateX(180deg);
-      text-align: left;
-      align-items: flex-start;
     }
 
     .flashcard-label {
@@ -467,6 +476,13 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease .35s;
+    }
+    .card-actions.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .btn-knew {
@@ -501,7 +517,16 @@
     }
 
     /* Session end */
-    .session-end { text-align: center; padding: 48px 0; display: none; }
+    .session-end {
+      text-align: center;
+      padding: 48px 32px;
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 24px;
+    }
     .session-end h2 { font-family: 'Instrument Serif', serif; font-size: 1.8rem; margin-bottom: 8px; }
     .session-end p { color: var(--text-2); margin-bottom: 24px; }
 
@@ -528,6 +553,9 @@
       text-align: center;
     }
     .stat-value { font-family: 'Instrument Serif', serif; font-size: 2rem; line-height: 1; margin-bottom: 4px; }
+    .stat-value--success { color: var(--accent); }
+    .stat-value--danger  { color: var(--danger); }
+    .stat-value--neutral { color: var(--text-3); }
     .stat-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
 
     .deck-section {
@@ -554,7 +582,8 @@
     .reset-zone {
       margin-top: 24px;
       padding: 16px;
-      border: 1px dashed var(--border);
+      background: var(--danger-light);
+      border: 1px solid #f0c0bb;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
@@ -562,6 +591,51 @@
       gap: 12px;
     }
     .reset-zone p { font-size: 13px; color: var(--text-2); }
+
+    /* ── SESSION FOOTER ── */
+    .session-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-count-label {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    /* ── STUDY HEADER ACTIONS ── */
+    .study-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── BUTTON SIZES ── */
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 13px;
+    }
+
+    /* ── END STAT COLORS ── */
+    .end-stat-value--success { color: var(--accent); }
+    .end-stat-value--danger  { color: var(--danger); }
+    .end-stat-value--neutral { color: var(--text); }
+
+    /* ── ACTION ROW ── */
+    .action-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── BUTTON DANGER ── */
+    .btn-danger {
+      color: var(--danger);
+      border-color: #f0c0bb;
+    }
 
     /* ── LOADING ── */
     .loading-state { text-align: center; padding: 64px; color: var(--text-2); font-size: 14px; }
@@ -594,6 +668,18 @@
 
     .hidden { display: none !important; }
 
+    /* ── FOCUS VISIBLE (accessibilité) ── */
+    .btn:focus-visible,
+    .btn-knew:focus-visible,
+    .tab-btn:focus-visible,
+    .pseudo-btn:focus-visible,
+    .back-link:focus-visible,
+    input[type="text"]:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
     @media (max-width: 600px) {
       .auth-card { padding: 32px 24px; }
       .app-main { padding: 20px 16px; }
@@ -601,6 +687,8 @@
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .flashcard-face { padding: 28px 24px; }
       .deck-chip { display: none; }
+      #user-pseudo-display { display: none; }
+      select { appearance: auto; }
     }
   </style>
 </head>
@@ -623,7 +711,7 @@
       <p class="error-msg" id="code-error"></p>
     </div>
 
-    <div class="deck-preview" id="deck-preview">
+    <div class="deck-preview hidden" id="deck-preview">
       <div class="deck-preview-title" id="deck-preview-title"></div>
       <div class="deck-preview-desc" id="deck-preview-desc"></div>
     </div>
@@ -633,9 +721,12 @@
 <!-- ──────────────────────────────────────────
      ÉTAPE 2 — CHOIX DU PSEUDO
 ──────────────────────────────────────────── -->
-<div class="screen-center" id="screen-pseudo" style="display:none">
+<div class="screen-center hidden" id="screen-pseudo">
   <div class="auth-card">
-    <button class="back-link" onclick="backToCode()">← Changer de code</button>
+    <button class="back-link" onclick="backToCode()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Changer de code
+    </button>
 
     <div class="auth-logo">Flash<span>cards</span></div>
     <p class="auth-subtitle" id="pseudo-deck-name"></p>
@@ -671,7 +762,7 @@
         <div class="avatar" id="user-avatar"></div>
         <span id="user-pseudo-display"></span>
       </div>
-      <button class="btn btn-ghost" onclick="logout()" style="padding:6px 12px;font-size:13px;">Quitter</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Quitter</button>
     </div>
   </header>
 
@@ -703,8 +794,8 @@
             </select>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-          <span style="font-size:13px;color:var(--text-2);" id="card-count-label">Chargement…</span>
+        <div class="session-footer">
+          <span class="card-count-label" id="card-count-label">Chargement…</span>
           <button class="btn btn-primary" onclick="startSession()" id="btn-start">Commencer</button>
         </div>
       </div>
@@ -712,10 +803,10 @@
       <div id="study-zone" class="hidden">
         <div class="study-header">
           <span class="study-progress"><strong id="card-index">1</strong> / <span id="card-total">0</span></span>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div class="study-header-actions">
             <span class="badge badge-green" id="session-known-count">✓ 0</span>
             <span class="badge badge-red" id="session-unknown-count">✗ 0</span>
-            <button class="btn btn-ghost" onclick="endSession()" style="padding:5px 10px;font-size:12px;">Arrêter</button>
+            <button class="btn btn-ghost btn-sm" onclick="endSession()">Arrêter</button>
           </div>
         </div>
 
@@ -738,8 +829,14 @@
         </div>
 
         <div class="card-actions" id="card-actions">
-          <button class="btn-knew no" onclick="markCard(false)">✗ Pas encore su</button>
-          <button class="btn-knew yes" onclick="markCard(true)">✓ Je savais</button>
+          <button class="btn-knew no" onclick="markCard(false)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Pas encore su
+          </button>
+          <button class="btn-knew yes" onclick="markCard(true)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l4 4 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Je savais
+          </button>
         </div>
 
         <div class="keyboard-hint">
@@ -752,19 +849,19 @@
         <p id="end-message"></p>
         <div class="end-stats">
           <div class="end-stat">
-            <div class="end-stat-value" id="end-known" style="color:var(--accent)">0</div>
+            <div class="end-stat-value end-stat-value--success" id="end-known">0</div>
             <div class="end-stat-label">Je savais</div>
           </div>
           <div class="end-stat">
-            <div class="end-stat-value" id="end-unknown" style="color:var(--danger)">0</div>
+            <div class="end-stat-value end-stat-value--danger" id="end-unknown">0</div>
             <div class="end-stat-label">À revoir</div>
           </div>
           <div class="end-stat">
-            <div class="end-stat-value" id="end-pct">0%</div>
+            <div class="end-stat-value end-stat-value--neutral" id="end-pct">0%</div>
             <div class="end-stat-label">Score</div>
           </div>
         </div>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <div class="action-row">
           <button class="btn btn-primary" onclick="startSession()">Recommencer</button>
           <button class="btn btn-ghost" onclick="resetToControls()">Changer les filtres</button>
         </div>
@@ -777,7 +874,7 @@
       <div id="deck-stats"></div>
       <div class="reset-zone">
         <p>Réinitialiser toute ma progression sur ce deck</p>
-        <button class="btn btn-ghost" onclick="confirmReset()" style="color:var(--danger);border-color:#f0c0bb;">Réinitialiser</button>
+        <button class="btn btn-ghost btn-danger" onclick="confirmReset()">Réinitialiser</button>
       </div>
     </div>
 
@@ -947,7 +1044,7 @@ async function validateCode() {
 
   if (!decksConfig[code]) {
     error.textContent = 'Code invalide. Vérifiez et réessayez.';
-    document.getElementById('deck-preview').style.display = 'none';
+    document.getElementById('deck-preview').classList.add('hidden');
     return;
   }
 
@@ -955,13 +1052,11 @@ async function validateCode() {
   currentCode = code;
   currentDeckConfig = decksConfig[code];
 
-  // Afficher preview
   document.getElementById('deck-preview-title').textContent = currentDeckConfig.label;
   document.getElementById('deck-preview-desc').textContent = currentDeckConfig.description || '';
-  document.getElementById('deck-preview').style.display = 'block';
+  document.getElementById('deck-preview').classList.remove('hidden');
 
-  // Aller à l'étape pseudo
-  setTimeout(() => goToPseudo(), 350);
+  goToPseudo();
 }
 
 document.getElementById('code-input').addEventListener('keydown', e => {
@@ -974,19 +1069,18 @@ document.getElementById('code-input').addEventListener('input', async () => {
   if (!decksConfig) {
     try { decksConfig = await fetchDecksConfig(); } catch { return; }
   }
-  const preview = document.getElementById('deck-preview');
   if (decksConfig && decksConfig[code]) {
     document.getElementById('deck-preview-title').textContent = decksConfig[code].label;
     document.getElementById('deck-preview-desc').textContent = decksConfig[code].description || '';
-    preview.style.display = 'block';
+    document.getElementById('deck-preview').classList.remove('hidden');
     document.getElementById('code-error').textContent = '';
   } else {
-    preview.style.display = 'none';
+    document.getElementById('deck-preview').classList.add('hidden');
   }
 });
 
 function backToCode() {
-  document.getElementById('screen-pseudo').style.display = 'none';
+  document.getElementById('screen-pseudo').classList.add('hidden');
   document.getElementById('screen-code').style.display = 'flex';
 }
 
@@ -995,8 +1089,9 @@ function backToCode() {
 // ──────────────────────────────────────────────
 function goToPseudo() {
   document.getElementById('screen-code').style.display = 'none';
-  document.getElementById('screen-pseudo').style.display = 'flex';
-  document.getElementById('pseudo-deck-name').textContent = currentDeckConfig.label;
+  document.getElementById('screen-pseudo').classList.remove('hidden');
+  document.getElementById('pseudo-deck-name').innerHTML =
+    `<span class="deck-badge">${currentDeckConfig.label}</span>`;
 
   renderPseudoList();
   document.getElementById('pseudo-input').value = '';
@@ -1060,7 +1155,7 @@ async function loginAs(pseudo) {
     currentDeckConfig.decks.map(d => `<option value="${d.id}">${d.label}</option>`).join('');
 
   // Afficher l'app
-  document.getElementById('screen-pseudo').style.display = 'none';
+  document.getElementById('screen-pseudo').classList.add('hidden');
   document.getElementById('screen-app').style.display = 'block';
   document.getElementById('header-deck-label').textContent = currentDeckConfig.label;
   document.getElementById('user-pseudo-display').textContent = pseudo;
@@ -1078,7 +1173,7 @@ function logout() {
   document.getElementById('screen-app').style.display = 'none';
   document.getElementById('screen-code').style.display = 'flex';
   document.getElementById('code-input').value = '';
-  document.getElementById('deck-preview').style.display = 'none';
+  document.getElementById('deck-preview').classList.add('hidden');
   document.getElementById('code-error').textContent = '';
   // Reset étude
   document.getElementById('study-zone').classList.add('hidden');
@@ -1161,7 +1256,7 @@ function showCard() {
   if (sessionIndex >= sessionCards.length) { endSession(); return; }
   isFlipped = false;
   document.getElementById('flashcard').classList.remove('flipped');
-  document.getElementById('card-actions').style.display = 'none';
+  document.getElementById('card-actions').classList.remove('visible');
   const card = sessionCards[sessionIndex];
   document.getElementById('card-index').textContent = sessionIndex + 1;
   document.getElementById('card-question').innerHTML = card.q;
@@ -1174,7 +1269,7 @@ function flipCard() {
   if (isFlipped) return;
   isFlipped = true;
   document.getElementById('flashcard').classList.add('flipped');
-  setTimeout(() => { document.getElementById('card-actions').style.display = 'grid'; }, 250);
+  document.getElementById('card-actions').classList.add('visible');
 }
 
 function markCard(knew) {
@@ -1191,7 +1286,6 @@ function markCard(knew) {
 function endSession() {
   document.getElementById('study-zone').classList.add('hidden');
   document.getElementById('session-end').style.display = 'block';
-  document.getElementById('session-controls').style.display = 'block';
   const total = sessionKnown + sessionUnknown;
   const pct = total > 0 ? Math.round((sessionKnown / total) * 100) : 0;
   document.getElementById('end-known').textContent = sessionKnown;
@@ -1201,7 +1295,10 @@ function endSession() {
   document.getElementById('end-message').textContent = total === 0 ? msgs[0] : pct === 100 ? msgs[4] : pct >= 80 ? msgs[3] : pct >= 50 ? msgs[2] : msgs[1];
 }
 
-function resetToControls() { document.getElementById('session-end').style.display = 'none'; }
+function resetToControls() {
+  document.getElementById('session-end').style.display = 'none';
+  document.getElementById('session-controls').style.display = 'block';
+}
 
 // ──────────────────────────────────────────────
 // PROGRESSION
@@ -1216,15 +1313,15 @@ function renderProgress() {
 
   document.getElementById('global-stats').innerHTML = `
     <div class="stat-card">
-      <div class="stat-value" style="color:var(--accent)">${known}</div>
+      <div class="stat-value stat-value--success">${known}</div>
       <div class="stat-label">Cartes sues</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" style="color:var(--danger)">${seen - known}</div>
+      <div class="stat-value stat-value--danger">${seen - known}</div>
       <div class="stat-label">À retravailler</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" style="color:var(--text-3)">${total - seen}</div>
+      <div class="stat-value stat-value--neutral">${total - seen}</div>
       <div class="stat-label">Pas encore vues</div>
     </div>
   `;
