@@ -75,17 +75,6 @@
       margin-bottom: 36px;
     }
 
-    .deck-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 12px;
-      background: var(--accent-light);
-      color: var(--accent);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
     .field-group {
       margin-bottom: 16px;
     }
@@ -180,58 +169,6 @@
       color: var(--text-2);
     }
 
-    /* Liste de profils */
-    .pseudo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 20px;
-    }
-
-    .pseudo-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 11px 14px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      transition: background .15s, border-color .15s;
-      text-align: left;
-    }
-    .pseudo-btn:hover { background: var(--accent-light); border-color: var(--accent); }
-    .pseudo-btn .pseudo-name { font-weight: 600; }
-    .pseudo-btn .pseudo-stats { font-size: 12px; color: var(--text-2); }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 4px 0 16px;
-      color: var(--text-3);
-      font-size: 12px;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text-2);
-      cursor: pointer;
-      margin-bottom: 24px;
-      background: none;
-      border: none;
-      font-family: inherit;
-      padding: 0;
-    }
-    .back-link:hover { color: var(--text); }
-
     /* ── APP ── */
     #screen-app { display: none; min-height: 100vh; }
 
@@ -273,32 +210,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .user-chip {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 12px;
-      background: var(--surface-2);
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-2);
-    }
-
-    .avatar {
-      width: 22px;
-      height: 22px;
-      background: var(--accent);
-      border-radius: 50%;
-      color: #fff;
-      font-size: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
     }
 
     .app-tabs {
@@ -672,8 +583,6 @@
     .btn:focus-visible,
     .btn-knew:focus-visible,
     .tab-btn:focus-visible,
-    .pseudo-btn:focus-visible,
-    .back-link:focus-visible,
     input[type="text"]:focus-visible,
     select:focus-visible {
       outline: 2px solid var(--accent);
@@ -687,7 +596,6 @@
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .flashcard-face { padding: 28px 24px; }
       .deck-chip { display: none; }
-      #user-pseudo-display { display: none; }
       select { appearance: auto; }
     }
   </style>
@@ -695,7 +603,7 @@
 <body>
 
 <!-- ──────────────────────────────────────────
-     ÉTAPE 1 — CODE DE RÉVISION
+     ÉCRAN CODE DE RÉVISION
 ──────────────────────────────────────────── -->
 <div class="screen-center" id="screen-code">
   <div class="auth-card">
@@ -719,35 +627,6 @@
 </div>
 
 <!-- ──────────────────────────────────────────
-     ÉTAPE 2 — CHOIX DU PSEUDO
-──────────────────────────────────────────── -->
-<div class="screen-center hidden" id="screen-pseudo">
-  <div class="auth-card">
-    <button class="back-link" onclick="backToCode()">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Changer de code
-    </button>
-
-    <div class="auth-logo">Flash<span>cards</span></div>
-    <p class="auth-subtitle" id="pseudo-deck-name"></p>
-
-    <div id="pseudo-existing-list"></div>
-
-    <div id="pseudo-new-section">
-      <div class="divider" id="pseudo-divider" style="display:none">Nouveau profil</div>
-      <div class="field-group">
-        <label for="pseudo-input">Votre pseudo</label>
-        <div class="field-row">
-          <input type="text" id="pseudo-input" placeholder="Choisissez un pseudo" maxlength="20" autocomplete="off" />
-          <button class="btn btn-primary" onclick="createAndLogin()">Commencer</button>
-        </div>
-        <p class="error-msg" id="pseudo-error"></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ──────────────────────────────────────────
      APP PRINCIPALE
 ──────────────────────────────────────────── -->
 <div id="screen-app">
@@ -758,11 +637,7 @@
       <span class="deck-chip" id="header-deck-label"></span>
     </div>
     <div class="header-right">
-      <div class="user-chip">
-        <div class="avatar" id="user-avatar"></div>
-        <span id="user-pseudo-display"></span>
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Quitter</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Changer de deck</button>
     </div>
   </header>
 
@@ -894,11 +769,10 @@
 // ──────────────────────────────────────────────
 const STORAGE_KEY = 'flashcards_app';
 
-let decksConfig = null;      // contenu de decks.json
-let currentCode = null;      // code de révision actif
-let currentDeckConfig = null;// config du deck (label, decks[])
-let currentUser = null;      // pseudo actif
-let allCards = {};           // { deckId: [{id, deckId, q, a}] }
+let decksConfig = null;       // contenu de decks.json
+let currentCode = null;       // code de révision actif
+let currentDeckConfig = null; // config du deck (label, decks[])
+let allCards = {};            // { deckId: [{id, deckId, q, a}] }
 
 let sessionCards = [];
 let sessionIndex = 0;
@@ -910,37 +784,19 @@ let isFlipped = false;
 // PERSISTANCE
 // ──────────────────────────────────────────────
 function loadStorage() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { profiles: {} }; }
-  catch { return { profiles: {} }; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
 }
 
 function saveStorage(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function profileKey(code, pseudo) { return `${code}::${pseudo}`; }
-
-function getProfile(code, pseudo) {
+function saveProgress(code, cardId, knew) {
   const store = loadStorage();
-  const key = profileKey(code, pseudo);
-  if (!store.profiles[key]) {
-    store.profiles[key] = { code, pseudo, created: Date.now(), progress: {} };
-    saveStorage(store);
-  }
-  return store.profiles[key];
-}
-
-function getProfilesForCode(code) {
-  const store = loadStorage();
-  return Object.values(store.profiles).filter(p => p.code === code);
-}
-
-function saveProgress(code, pseudo, cardId, knew) {
-  const store = loadStorage();
-  const key = profileKey(code, pseudo);
-  if (!store.profiles[key]) return;
-  const prev = store.profiles[key].progress[cardId];
-  store.profiles[key].progress[cardId] = {
+  if (!store[code]) store[code] = { progress: {} };
+  const prev = store[code].progress[cardId];
+  store[code].progress[cardId] = {
     knew,
     seenAt: Date.now(),
     seenCount: ((prev && prev.seenCount) || 0) + 1,
@@ -949,16 +805,14 @@ function saveProgress(code, pseudo, cardId, knew) {
   saveStorage(store);
 }
 
-function getProgress(code, pseudo) {
+function getProgress(code) {
   const store = loadStorage();
-  const key = profileKey(code, pseudo);
-  return (store.profiles[key] && store.profiles[key].progress) || {};
+  return (store[code] && store[code].progress) || {};
 }
 
-function resetProgress(code, pseudo) {
+function resetProgress(code) {
   const store = loadStorage();
-  const key = profileKey(code, pseudo);
-  if (store.profiles[key]) store.profiles[key].progress = {};
+  if (store[code]) store[code].progress = {};
   saveStorage(store);
 }
 
@@ -1028,7 +882,7 @@ async function loadDeckCSVs(deckConfig) {
 }
 
 // ──────────────────────────────────────────────
-// ÉTAPE 1 — CODE
+// CODE DE RÉVISION
 // ──────────────────────────────────────────────
 async function validateCode() {
   const input = document.getElementById('code-input');
@@ -1056,7 +910,7 @@ async function validateCode() {
   document.getElementById('deck-preview-desc').textContent = currentDeckConfig.description || '';
   document.getElementById('deck-preview').classList.remove('hidden');
 
-  goToPseudo();
+  enterApp();
 }
 
 document.getElementById('code-input').addEventListener('keydown', e => {
@@ -1079,94 +933,22 @@ document.getElementById('code-input').addEventListener('input', async () => {
   }
 });
 
-function backToCode() {
-  document.getElementById('screen-pseudo').classList.add('hidden');
-  document.getElementById('screen-code').style.display = 'flex';
-}
-
-// ──────────────────────────────────────────────
-// ÉTAPE 2 — PSEUDO
-// ──────────────────────────────────────────────
-function goToPseudo() {
-  document.getElementById('screen-code').style.display = 'none';
-  document.getElementById('screen-pseudo').classList.remove('hidden');
-  document.getElementById('pseudo-deck-name').innerHTML =
-    `<span class="deck-badge">${currentDeckConfig.label}</span>`;
-
-  renderPseudoList();
-  document.getElementById('pseudo-input').value = '';
-  document.getElementById('pseudo-error').textContent = '';
-}
-
-function renderPseudoList() {
-  const profiles = getProfilesForCode(currentCode);
-  const listEl = document.getElementById('pseudo-existing-list');
-  const divider = document.getElementById('pseudo-divider');
-  listEl.innerHTML = '';
-
-  if (profiles.length > 0) {
-    const ul = document.createElement('div');
-    ul.className = 'pseudo-list';
-    profiles.forEach(p => {
-      const progress = p.progress || {};
-      const seen = Object.keys(progress).length;
-      const known = Object.values(progress).filter(x => x.knew).length;
-      const btn = document.createElement('button');
-      btn.className = 'pseudo-btn';
-      btn.innerHTML = `<span class="pseudo-name">${escapeHTML(p.pseudo)}</span>
-                       <span class="pseudo-stats">${seen} vues · ${known} sues</span>`;
-      btn.onclick = () => loginAs(p.pseudo);
-      ul.appendChild(btn);
-    });
-    listEl.appendChild(ul);
-    divider.style.display = '';
-  } else {
-    divider.style.display = 'none';
-  }
-}
-
-function createAndLogin() {
-  const input = document.getElementById('pseudo-input');
-  const error = document.getElementById('pseudo-error');
-  const pseudo = input.value.trim();
-
-  if (pseudo.length < 3) {
-    error.textContent = 'Le pseudo doit faire au moins 3 caractères.';
-    return;
-  }
-  error.textContent = '';
-  loginAs(pseudo);
-}
-
-document.getElementById('pseudo-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') createAndLogin();
-});
-
-async function loginAs(pseudo) {
-  getProfile(currentCode, pseudo);
-  currentUser = pseudo;
-
-  // Charger les CSV
+async function enterApp() {
   await loadDeckCSVs(currentDeckConfig);
 
-  // Remplir le select de decks
   const sel = document.getElementById('select-deck');
   sel.innerHTML = `<option value="all">Tous les decks</option>` +
     currentDeckConfig.decks.map(d => `<option value="${d.id}">${d.label}</option>`).join('');
 
-  // Afficher l'app
-  document.getElementById('screen-pseudo').classList.add('hidden');
+  document.getElementById('screen-code').style.display = 'none';
   document.getElementById('screen-app').style.display = 'block';
   document.getElementById('header-deck-label').textContent = currentDeckConfig.label;
-  document.getElementById('user-pseudo-display').textContent = pseudo;
-  document.getElementById('user-avatar').textContent = pseudo[0].toUpperCase();
 
   updateCardCount();
   renderProgress();
 }
 
 function logout() {
-  currentUser = null;
   currentCode = null;
   currentDeckConfig = null;
   allCards = {};
@@ -1175,7 +957,6 @@ function logout() {
   document.getElementById('code-input').value = '';
   document.getElementById('deck-preview').classList.add('hidden');
   document.getElementById('code-error').textContent = '';
-  // Reset étude
   document.getElementById('study-zone').classList.add('hidden');
   document.getElementById('session-end').style.display = 'none';
   document.getElementById('session-controls').style.display = 'block';
@@ -1198,7 +979,7 @@ function switchTab(view, btn) {
 function getFilteredCards() {
   const deckId = document.getElementById('select-deck').value;
   const filter = document.getElementById('select-filter').value;
-  const progress = getProgress(currentCode, currentUser);
+  const progress = getProgress(currentCode);
 
   let cards = deckId === 'all'
     ? Object.values(allCards).flat()
@@ -1220,7 +1001,7 @@ function shuffle(arr) {
 }
 
 function updateCardCount() {
-  if (!currentUser) return;
+  if (!currentCode) return;
   const cards = getFilteredCards();
   const label = document.getElementById('card-count-label');
   const btn = document.getElementById('btn-start');
@@ -1275,7 +1056,7 @@ function flipCard() {
 function markCard(knew) {
   if (!isFlipped) { flipCard(); return; }
   const card = sessionCards[sessionIndex];
-  saveProgress(currentCode, currentUser, card.id, knew);
+  saveProgress(currentCode, card.id, knew);
   if (knew) sessionKnown++; else sessionUnknown++;
   document.getElementById('session-known-count').textContent = `✓ ${sessionKnown}`;
   document.getElementById('session-unknown-count').textContent = `✗ ${sessionUnknown}`;
@@ -1304,8 +1085,8 @@ function resetToControls() {
 // PROGRESSION
 // ──────────────────────────────────────────────
 function renderProgress() {
-  if (!currentUser || !currentDeckConfig) return;
-  const progress = getProgress(currentCode, currentUser);
+  if (!currentCode || !currentDeckConfig) return;
+  const progress = getProgress(currentCode);
   const allFlat = Object.values(allCards).flat();
   const total = allFlat.length;
   const seen = Object.keys(progress).length;
@@ -1356,8 +1137,8 @@ function renderProgress() {
 }
 
 function confirmReset() {
-  if (!confirm(`Réinitialiser toute la progression de "${currentUser}" sur ce deck ?`)) return;
-  resetProgress(currentCode, currentUser);
+  if (!confirm('Réinitialiser toute la progression sur ce deck ? Cette action est irréversible.')) return;
+  resetProgress(currentCode);
   renderProgress();
   updateCardCount();
   showToast('Progression réinitialisée.');
@@ -1367,7 +1148,7 @@ function confirmReset() {
 // CLAVIER
 // ──────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (!currentUser) return;
+  if (!currentCode) return;
   if (document.getElementById('study-zone').classList.contains('hidden')) return;
   if (e.target.tagName === 'INPUT') return;
   if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); if (!isFlipped) flipCard(); }
