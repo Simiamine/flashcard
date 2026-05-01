@@ -1,0 +1,12 @@
+{
+  "PSYCHO26": {
+    "label": "Psychologie L1 — 2025/2026",
+    "description": "Épistémologie · Clinique · Développement · Différentielle",
+    "decks": [
+      { "id": "epistemologie",  "label": "Épistémologie",                 "file": "data/epistemologie.csv" },
+      { "id": "clinique",       "label": "Psychologie Clinique",           "file": "data/clinique.csv" },
+      { "id": "developpement",  "label": "Psychologie du Développement",   "file": "data/developpement.csv" },
+      { "id": "differentielle", "label": "Psychologie Différentielle",     "file": "data/differentielle.csv" }
+    ]
+  }
+}

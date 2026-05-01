@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Révision Psychologie</title>
+  <title>Flashcards</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -24,11 +24,8 @@
       --danger-light: #fdf0ef;
       --success: #2d5a3d;
       --success-light: #e8f0eb;
-      --warning: #b45309;
-      --warning-light: #fef3c7;
       --radius: 12px;
       --radius-sm: 8px;
-      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
       --shadow-card: 0 2px 8px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.08);
     }
 
@@ -41,8 +38,8 @@
       line-height: 1.5;
     }
 
-    /* ── ÉCRAN D'ACCUEIL / PSEUDO ── */
-    #screen-auth {
+    /* ── ÉCRANS CENTRÉS ── */
+    .screen-center {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -54,77 +51,52 @@
       background: var(--surface);
       border-radius: var(--radius);
       padding: 48px 40px;
-      max-width: 420px;
+      max-width: 440px;
       width: 100%;
       box-shadow: var(--shadow-card);
-      text-align: center;
     }
 
-    .auth-card h1 {
+    .auth-logo {
       font-family: 'Instrument Serif', serif;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 400;
-      margin-bottom: 6px;
       color: var(--text);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .auth-card .subtitle {
+    .auth-logo span { font-style: italic; color: var(--accent); }
+
+    .auth-subtitle {
       color: var(--text-2);
-      font-size: 14px;
-      margin-bottom: 32px;
+      font-size: 13px;
+      margin-bottom: 36px;
     }
 
-    .pseudo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
+    .field-group {
+      margin-bottom: 16px;
     }
 
-    .pseudo-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
-      text-align: left;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-    }
-
-    .pseudo-btn:hover { background: var(--accent-light); border-color: var(--accent); }
-
-    .pseudo-btn .pseudo-name { font-weight: 600; }
-    .pseudo-btn .pseudo-stats { color: var(--text-2); font-size: 12px; }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      color: var(--text-3);
+    .field-group label {
+      display: block;
       font-size: 12px;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin-bottom: 8px;
     }
 
-    .input-group {
+    .field-row {
       display: flex;
       gap: 8px;
     }
 
-    input[type="text"] {
-      flex: 1;
-      padding: 10px 14px;
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       font-family: inherit;
@@ -132,13 +104,15 @@
       color: var(--text);
       background: var(--surface);
       outline: none;
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45,90,61,.1);
     }
 
-    input[type="text"]:focus { border-color: var(--accent); }
-
     .btn {
-      padding: 10px 20px;
+      padding: 11px 20px;
       border-radius: var(--radius-sm);
       border: none;
       font-family: inherit;
@@ -149,12 +123,10 @@
       white-space: nowrap;
     }
     .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 
     .btn-ghost {
       background: transparent;
@@ -163,17 +135,95 @@
     }
     .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
 
+    .btn-full { width: 100%; justify-content: center; }
+
     .error-msg {
       color: var(--danger);
       font-size: 12px;
       margin-top: 8px;
-      min-height: 16px;
+      min-height: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* ── APP PRINCIPALE ── */
+    /* Deck preview dans l'écran code */
+    .deck-preview {
+      background: var(--accent-light);
+      border: 1px solid #b2d4bd;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .deck-preview-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .deck-preview-desc {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    /* Liste de profils */
+    .pseudo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .pseudo-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      transition: background .15s, border-color .15s;
+      text-align: left;
+    }
+    .pseudo-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+    .pseudo-btn .pseudo-name { font-weight: 600; }
+    .pseudo-btn .pseudo-stats { font-size: 12px; color: var(--text-2); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0 16px;
+      color: var(--text-3);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-2);
+      cursor: pointer;
+      margin-bottom: 24px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+    }
+    .back-link:hover { color: var(--text); }
+
+    /* ── APP ── */
     #screen-app { display: none; min-height: 100vh; }
 
-    /* Header */
     .app-header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -187,22 +237,37 @@
       z-index: 10;
     }
 
-    .app-header h1 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.2rem;
-      font-weight: 400;
-    }
-
-    .header-right {
+    .app-header-left {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
+    .app-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+    }
+
+    .deck-chip {
+      font-size: 12px;
+      color: var(--text-3);
+      padding: 3px 10px;
+      background: var(--surface-2);
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .user-chip {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       padding: 5px 12px;
       background: var(--surface-2);
       border-radius: 20px;
@@ -211,7 +276,7 @@
       color: var(--text-2);
     }
 
-    .user-chip .avatar {
+    .avatar {
       width: 22px;
       height: 22px;
       background: var(--accent);
@@ -221,13 +286,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
-    /* Nav onglets */
     .app-tabs {
       display: flex;
-      gap: 0;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
       padding: 0 24px;
@@ -248,32 +312,66 @@
       white-space: nowrap;
       transition: color .15s;
     }
-
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* Contenu principal */
     .app-main {
       max-width: 760px;
       margin: 0 auto;
       padding: 32px 24px;
     }
 
-    /* ── VUE FLASHCARD ── */
+    /* ── FLASHCARD ── */
     #view-study { display: none; }
+
+    .session-controls {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .session-controls h2 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    select:focus { border-color: var(--accent); }
 
     .study-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    .study-progress {
-      font-size: 13px;
-      color: var(--text-2);
-    }
-
+    .study-progress { font-size: 13px; color: var(--text-2); }
     .study-progress strong { color: var(--text); }
 
     .progress-bar {
@@ -284,7 +382,6 @@
       margin-bottom: 24px;
       overflow: hidden;
     }
-
     .progress-fill {
       height: 100%;
       background: var(--accent);
@@ -292,11 +389,7 @@
       transition: width .3s ease;
     }
 
-    /* Flashcard */
-    .flashcard-scene {
-      perspective: 1000px;
-      margin-bottom: 24px;
-    }
+    .flashcard-scene { perspective: 1000px; margin-bottom: 20px; }
 
     .flashcard {
       position: relative;
@@ -306,7 +399,6 @@
       transition: transform .45s cubic-bezier(.4,0,.2,1);
       cursor: pointer;
     }
-
     .flashcard.flipped { transform: rotateX(180deg); }
 
     .flashcard-face {
@@ -345,17 +437,13 @@
       font-family: 'Instrument Serif', serif;
       font-size: 1.35rem;
       line-height: 1.45;
-      color: var(--text);
     }
 
     .flashcard-answer {
       font-size: 14px;
-      line-height: 1.7;
-      color: var(--text);
+      line-height: 1.75;
     }
-
     .flashcard-answer b { color: var(--accent); }
-    .flashcard-answer i { color: var(--text-2); }
 
     .flip-hint {
       display: flex;
@@ -365,7 +453,6 @@
       color: var(--text-3);
       margin-top: 20px;
     }
-
     .flip-hint kbd {
       padding: 2px 6px;
       background: var(--surface-2);
@@ -375,12 +462,11 @@
       font-size: 11px;
     }
 
-    /* Actions su/pas su */
     .card-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .btn-knew {
@@ -399,26 +485,12 @@
     }
     .btn-knew:active { transform: scale(.97); }
 
-    .btn-knew.yes {
-      background: var(--success-light);
-      border-color: #b2d4bd;
-      color: var(--success);
-    }
+    .btn-knew.yes { background: var(--success-light); border-color: #b2d4bd; color: var(--success); }
     .btn-knew.yes:hover { background: #d0e8d8; border-color: var(--accent); }
-
-    .btn-knew.no {
-      background: var(--danger-light);
-      border-color: #f0c0bb;
-      color: var(--danger);
-    }
+    .btn-knew.no { background: var(--danger-light); border-color: #f0c0bb; color: var(--danger); }
     .btn-knew.no:hover { background: #fad8d5; border-color: var(--danger); }
 
-    .keyboard-hint {
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-3);
-    }
-
+    .keyboard-hint { text-align: center; font-size: 12px; color: var(--text-3); }
     .keyboard-hint kbd {
       padding: 2px 6px;
       background: var(--surface);
@@ -428,53 +500,17 @@
       font-size: 11px;
     }
 
-    /* ── CONTRÔLES DE SESSION ── */
-    .session-controls {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 24px;
-    }
+    /* Session end */
+    .session-end { text-align: center; padding: 48px 0; display: none; }
+    .session-end h2 { font-family: 'Instrument Serif', serif; font-size: 1.8rem; margin-bottom: 8px; }
+    .session-end p { color: var(--text-2); margin-bottom: 24px; }
 
-    .session-controls h2 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
+    .end-stats { display: flex; gap: 24px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+    .end-stat { text-align: center; }
+    .end-stat-value { font-family: 'Instrument Serif', serif; font-size: 2.5rem; }
+    .end-stat-label { font-size: 13px; color: var(--text-2); }
 
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .control-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-2);
-      margin-bottom: 6px;
-    }
-
-    select {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: inherit;
-      font-size: 13px;
-      color: var(--text);
-      background: var(--surface);
-      outline: none;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
-    select:focus { border-color: var(--accent); }
-
-    /* ── VUE PROGRESSION ── */
+    /* ── PROGRESSION ── */
     #view-progress { display: none; }
 
     .stats-grid {
@@ -491,80 +527,26 @@
       padding: 20px;
       text-align: center;
     }
+    .stat-value { font-family: 'Instrument Serif', serif; font-size: 2rem; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
 
-    .stat-value {
-      font-family: 'Instrument Serif', serif;
-      font-size: 2rem;
-      color: var(--text);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-2);
-      font-weight: 500;
-    }
-
-    .matiere-section {
+    .deck-section {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 12px;
     }
+    .deck-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .deck-section-title { font-size: 14px; font-weight: 600; }
+    .deck-section-count { font-size: 12px; color: var(--text-2); }
 
-    .matiere-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
+    .deck-bar { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+    .deck-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .5s ease; }
 
-    .matiere-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .matiere-count {
-      font-size: 12px;
-      color: var(--text-2);
-    }
-
-    .matiere-bar {
-      height: 8px;
-      background: var(--surface-2);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .matiere-bar-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 4px;
-      transition: width .5s ease;
-    }
-
-    .matiere-detail {
-      display: flex;
-      gap: 16px;
-      margin-top: 10px;
-    }
-
-    .detail-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-2);
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .deck-detail { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+    .detail-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .dot-green { background: var(--accent); }
     .dot-red { background: var(--danger); }
     .dot-gray { background: var(--border); }
@@ -577,159 +559,119 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
-
-    .reset-zone p {
-      font-size: 13px;
-      color: var(--text-2);
-    }
-
-    /* ── SESSION TERMINÉE ── */
-    .session-end {
-      text-align: center;
-      padding: 48px 0;
-      display: none;
-    }
-
-    .session-end h2 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-    }
-
-    .session-end p {
-      color: var(--text-2);
-      margin-bottom: 24px;
-    }
-
-    .end-stats {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-      margin-bottom: 32px;
-    }
-
-    .end-stat {
-      text-align: center;
-    }
-
-    .end-stat-value {
-      font-family: 'Instrument Serif', serif;
-      font-size: 2.5rem;
-    }
-
-    .end-stat-label {
-      font-size: 13px;
-      color: var(--text-2);
-    }
-
-    /* ── TOAST ── */
-    .toast-container {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    .toast {
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      background: var(--text);
-      color: #fff;
-      box-shadow: var(--shadow);
-      animation: toast-in .2s ease, toast-out .2s ease 3.8s forwards;
-    }
-
-    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
-
-    /* ── UTILITAIRES ── */
-    .hidden { display: none !important; }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .badge-green { background: var(--success-light); color: var(--success); }
-    .badge-red { background: var(--danger-light); color: var(--danger); }
-    .badge-gray { background: var(--surface-2); color: var(--text-2); }
+    .reset-zone p { font-size: 13px; color: var(--text-2); }
 
     /* ── LOADING ── */
-    .loading-state {
-      text-align: center;
-      padding: 64px;
-      color: var(--text-2);
-      font-size: 14px;
-    }
-
+    .loading-state { text-align: center; padding: 64px; color: var(--text-2); font-size: 14px; }
     .spinner {
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
+      width: 32px; height: 32px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin .8s linear infinite;
       margin: 0 auto 16px;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Responsive */
+    /* ── BADGE ── */
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-green { background: var(--success-light); color: var(--success); }
+    .badge-red { background: var(--danger-light); color: var(--danger); }
+
+    /* ── TOAST ── */
+    .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast {
+      padding: 10px 16px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      background: var(--text); color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      animation: toast-in .2s ease, toast-out .2s ease 3.8s forwards;
+      white-space: nowrap;
+    }
+    @keyframes toast-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toast-out { from { opacity:1; } to { opacity:0; } }
+
+    .hidden { display: none !important; }
+
     @media (max-width: 600px) {
+      .auth-card { padding: 32px 24px; }
       .app-main { padding: 20px 16px; }
       .controls-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .flashcard-face { padding: 28px 24px; }
-      .auth-card { padding: 32px 24px; }
+      .deck-chip { display: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- ──────────── ÉCRAN AUTH ──────────── -->
-<div id="screen-auth">
+<!-- ──────────────────────────────────────────
+     ÉTAPE 1 — CODE DE RÉVISION
+──────────────────────────────────────────── -->
+<div class="screen-center" id="screen-code">
   <div class="auth-card">
-    <h1>Révision Psycho</h1>
-    <p class="subtitle">Épistémologie · Clinique · Développement · Différentielle</p>
+    <div class="auth-logo">Flash<span>cards</span></div>
+    <p class="auth-subtitle">Entrez votre code de révision pour accéder à vos cartes.</p>
 
-    <div id="pseudo-list-wrapper">
-      <!-- Rempli dynamiquement si des pseudos existent -->
+    <div class="field-group">
+      <label for="code-input">Code de révision</label>
+      <div class="field-row">
+        <input type="text" id="code-input" placeholder="Ex : PSYCHO26" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        <button class="btn btn-primary" onclick="validateCode()">Accéder</button>
+      </div>
+      <p class="error-msg" id="code-error"></p>
     </div>
 
-    <div id="new-pseudo-section">
-      <div class="divider" id="auth-divider" style="display:none">Nouveau profil</div>
-      <div class="input-group">
-        <input type="text" id="pseudo-input" placeholder="Pseudo (min. 3 lettres)" maxlength="20" autocomplete="off" />
-        <button class="btn btn-primary" onclick="createAndLogin()">Commencer</button>
-      </div>
-      <p class="error-msg" id="pseudo-error"></p>
+    <div class="deck-preview" id="deck-preview">
+      <div class="deck-preview-title" id="deck-preview-title"></div>
+      <div class="deck-preview-desc" id="deck-preview-desc"></div>
     </div>
   </div>
 </div>
 
-<!-- ──────────── ÉCRAN APP ──────────── -->
+<!-- ──────────────────────────────────────────
+     ÉTAPE 2 — CHOIX DU PSEUDO
+──────────────────────────────────────────── -->
+<div class="screen-center" id="screen-pseudo" style="display:none">
+  <div class="auth-card">
+    <button class="back-link" onclick="backToCode()">← Changer de code</button>
+
+    <div class="auth-logo">Flash<span>cards</span></div>
+    <p class="auth-subtitle" id="pseudo-deck-name"></p>
+
+    <div id="pseudo-existing-list"></div>
+
+    <div id="pseudo-new-section">
+      <div class="divider" id="pseudo-divider" style="display:none">Nouveau profil</div>
+      <div class="field-group">
+        <label for="pseudo-input">Votre pseudo</label>
+        <div class="field-row">
+          <input type="text" id="pseudo-input" placeholder="Choisissez un pseudo" maxlength="20" autocomplete="off" />
+          <button class="btn btn-primary" onclick="createAndLogin()">Commencer</button>
+        </div>
+        <p class="error-msg" id="pseudo-error"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────
+     APP PRINCIPALE
+──────────────────────────────────────────── -->
 <div id="screen-app">
 
   <header class="app-header">
-    <h1>Révision Psycho</h1>
+    <div class="app-header-left">
+      <span class="app-title">Flashcards</span>
+      <span class="deck-chip" id="header-deck-label"></span>
+    </div>
     <div class="header-right">
       <div class="user-chip">
         <div class="avatar" id="user-avatar"></div>
         <span id="user-pseudo-display"></span>
       </div>
-      <button class="btn btn-ghost" onclick="logout()" style="padding:6px 12px;font-size:13px;">Changer</button>
+      <button class="btn btn-ghost" onclick="logout()" style="padding:6px 12px;font-size:13px;">Quitter</button>
     </div>
   </header>
 
@@ -740,21 +682,16 @@
 
   <main class="app-main">
 
-    <!-- ── VUE RÉVISION ── -->
+    <!-- VUE RÉVISION -->
     <div id="view-study">
 
-      <!-- Contrôles de session -->
       <div class="session-controls" id="session-controls">
         <h2>Configurer la session</h2>
         <div class="controls-grid">
           <div class="control-group">
-            <label for="select-matiere">Matière</label>
-            <select id="select-matiere" onchange="updateCardCount()">
-              <option value="all">Toutes les matières</option>
-              <option value="epistemologie">Épistémologie</option>
-              <option value="clinique">Psychologie Clinique</option>
-              <option value="developpement">Psychologie du Développement</option>
-              <option value="differentielle">Psychologie Différentielle</option>
+            <label for="select-deck">Deck</label>
+            <select id="select-deck" onchange="updateCardCount()">
+              <!-- Rempli dynamiquement -->
             </select>
           </div>
           <div class="control-group">
@@ -766,13 +703,12 @@
             </select>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <span style="font-size:13px;color:var(--text-2);" id="card-count-label">Chargement…</span>
           <button class="btn btn-primary" onclick="startSession()" id="btn-start">Commencer</button>
         </div>
       </div>
 
-      <!-- Zone d'étude -->
       <div id="study-zone" class="hidden">
         <div class="study-header">
           <span class="study-progress"><strong id="card-index">1</strong> / <span id="card-total">0</span></span>
@@ -792,9 +728,7 @@
             <div class="flashcard-face front">
               <div class="flashcard-label">Question</div>
               <div class="flashcard-question" id="card-question"></div>
-              <div class="flip-hint">
-                <kbd>Espace</kbd> pour retourner
-              </div>
+              <div class="flip-hint"><kbd>Espace</kbd> pour retourner</div>
             </div>
             <div class="flashcard-face back">
               <div class="flashcard-label">Réponse</div>
@@ -804,12 +738,8 @@
         </div>
 
         <div class="card-actions" id="card-actions">
-          <button class="btn-knew no" onclick="markCard(false)">
-            ✗ Pas encore su
-          </button>
-          <button class="btn-knew yes" onclick="markCard(true)">
-            ✓ Je savais
-          </button>
+          <button class="btn-knew no" onclick="markCard(false)">✗ Pas encore su</button>
+          <button class="btn-knew yes" onclick="markCard(true)">✓ Je savais</button>
         </div>
 
         <div class="keyboard-hint">
@@ -817,7 +747,6 @@
         </div>
       </div>
 
-      <!-- Session terminée -->
       <div class="session-end" id="session-end">
         <h2>Session terminée !</h2>
         <p id="end-message"></p>
@@ -840,21 +769,19 @@
           <button class="btn btn-ghost" onclick="resetToControls()">Changer les filtres</button>
         </div>
       </div>
-
     </div>
 
-    <!-- ── VUE PROGRESSION ── -->
+    <!-- VUE PROGRESSION -->
     <div id="view-progress">
       <div class="stats-grid" id="global-stats"></div>
-      <div id="matiere-stats"></div>
-
+      <div id="deck-stats"></div>
       <div class="reset-zone">
-        <p>Réinitialiser toute ma progression</p>
+        <p>Réinitialiser toute ma progression sur ce deck</p>
         <button class="btn btn-ghost" onclick="confirmReset()" style="color:var(--danger);border-color:#f0c0bb;">Réinitialiser</button>
       </div>
     </div>
 
-    <div class="loading-state" id="loading-state">
+    <div class="loading-state" id="loading-state" style="display:none">
       <div class="spinner"></div>
       <p>Chargement des cartes…</p>
     </div>
@@ -862,60 +789,61 @@
   </main>
 </div>
 
-<!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ────────────────────────────────────────────────────────
-// CONFIGURATION
-// ────────────────────────────────────────────────────────
-const MATIERES = {
-  epistemologie:  { label: 'Épistémologie',              file: 'data/epistemologie.csv' },
-  clinique:       { label: 'Psychologie Clinique',        file: 'data/clinique.csv' },
-  developpement:  { label: 'Psychologie du Développement', file: 'data/developpement.csv' },
-  differentielle: { label: 'Psychologie Différentielle',   file: 'data/differentielle.csv' },
-};
-
-const STORAGE_KEY = 'psycho_revision';
-
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // ÉTAT GLOBAL
-// ────────────────────────────────────────────────────────
-let allCards = {};          // { matiere: [{q, a, id}] }
-let currentUser = null;
+// ──────────────────────────────────────────────
+const STORAGE_KEY = 'flashcards_app';
+
+let decksConfig = null;      // contenu de decks.json
+let currentCode = null;      // code de révision actif
+let currentDeckConfig = null;// config du deck (label, decks[])
+let currentUser = null;      // pseudo actif
+let allCards = {};           // { deckId: [{id, deckId, q, a}] }
+
 let sessionCards = [];
 let sessionIndex = 0;
 let sessionKnown = 0;
 let sessionUnknown = 0;
 let isFlipped = false;
 
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // PERSISTANCE
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 function loadStorage() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { users: {} }; }
-  catch { return { users: {} }; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { profiles: {} }; }
+  catch { return { profiles: {} }; }
 }
 
 function saveStorage(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function getUserData(pseudo) {
+function profileKey(code, pseudo) { return `${code}::${pseudo}`; }
+
+function getProfile(code, pseudo) {
   const store = loadStorage();
-  if (!store.users[pseudo]) {
-    store.users[pseudo] = { pseudo, created: Date.now(), progress: {} };
+  const key = profileKey(code, pseudo);
+  if (!store.profiles[key]) {
+    store.profiles[key] = { code, pseudo, created: Date.now(), progress: {} };
     saveStorage(store);
   }
-  return store.users[pseudo];
+  return store.profiles[key];
 }
 
-function saveProgress(pseudo, cardId, knew) {
+function getProfilesForCode(code) {
   const store = loadStorage();
-  if (!store.users[pseudo]) return;
-  if (!store.users[pseudo].progress) store.users[pseudo].progress = {};
-  const prev = store.users[pseudo].progress[cardId];
-  store.users[pseudo].progress[cardId] = {
+  return Object.values(store.profiles).filter(p => p.code === code);
+}
+
+function saveProgress(code, pseudo, cardId, knew) {
+  const store = loadStorage();
+  const key = profileKey(code, pseudo);
+  if (!store.profiles[key]) return;
+  const prev = store.profiles[key].progress[cardId];
+  store.profiles[key].progress[cardId] = {
     knew,
     seenAt: Date.now(),
     seenCount: ((prev && prev.seenCount) || 0) + 1,
@@ -924,45 +852,43 @@ function saveProgress(pseudo, cardId, knew) {
   saveStorage(store);
 }
 
-function getProgress(pseudo) {
+function getProgress(code, pseudo) {
   const store = loadStorage();
-  return (store.users[pseudo] && store.users[pseudo].progress) || {};
+  const key = profileKey(code, pseudo);
+  return (store.profiles[key] && store.profiles[key].progress) || {};
 }
 
-function resetProgress(pseudo) {
+function resetProgress(code, pseudo) {
   const store = loadStorage();
-  if (store.users[pseudo]) store.users[pseudo].progress = {};
+  const key = profileKey(code, pseudo);
+  if (store.profiles[key]) store.profiles[key].progress = {};
   saveStorage(store);
 }
 
-// ────────────────────────────────────────────────────────
-// CHARGEMENT CSV
-// ────────────────────────────────────────────────────────
-function parseCSV(text, matiere) {
+// ──────────────────────────────────────────────
+// CHARGEMENT decks.json + CSV
+// ──────────────────────────────────────────────
+async function fetchDecksConfig() {
+  const res = await fetch('decks.json');
+  return res.json();
+}
+
+function parseCSV(text, deckId) {
   const lines = text.split('\n');
   const cards = [];
   let inData = false;
-
   for (const raw of lines) {
     const line = raw.trim();
-    if (!line) continue;
-    if (line.startsWith('#')) continue;
-
-    // ligne d'en-tête
+    if (!line || line.startsWith('#')) continue;
     if (!inData) {
       if (line.toLowerCase().startsWith('question')) { inData = true; }
       continue;
     }
-
-    // parser une ligne CSV avec guillemets
     const cols = parseCSVLine(line);
     if (cols.length >= 2) {
       const q = cols[0].trim();
       const a = cols[1].trim();
-      if (q && a) {
-        const id = `${matiere}::${cards.length}`;
-        cards.push({ id, matiere, q, a });
-      }
+      if (q && a) cards.push({ id: `${deckId}::${cards.length}`, deckId, q, a });
     }
   }
   return cards;
@@ -972,70 +898,132 @@ function parseCSVLine(line) {
   const cols = [];
   let current = '';
   let inQuotes = false;
-
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
       else { inQuotes = !inQuotes; }
     } else if (ch === ';' && !inQuotes) {
-      cols.push(current);
-      current = '';
-    } else {
-      current += ch;
-    }
+      cols.push(current); current = '';
+    } else { current += ch; }
   }
   cols.push(current);
   return cols;
 }
 
-async function loadAllCSV() {
+async function loadDeckCSVs(deckConfig) {
   document.getElementById('loading-state').style.display = 'block';
+  allCards = {};
   const results = await Promise.all(
-    Object.entries(MATIERES).map(async ([key, { file }]) => {
+    deckConfig.decks.map(async ({ id, file }) => {
       try {
         const res = await fetch(file);
         const text = await res.text();
-        return [key, parseCSV(text, key)];
+        return [id, parseCSV(text, id)];
       } catch {
         console.warn(`Impossible de charger ${file}`);
-        return [key, []];
+        return [id, []];
       }
     })
   );
   allCards = Object.fromEntries(results);
   document.getElementById('loading-state').style.display = 'none';
-  updateCardCount();
 }
 
-// ────────────────────────────────────────────────────────
-// AUTH
-// ────────────────────────────────────────────────────────
-function renderAuthScreen() {
-  const store = loadStorage();
-  const users = Object.values(store.users);
-  const listWrapper = document.getElementById('pseudo-list-wrapper');
-  const divider = document.getElementById('auth-divider');
+// ──────────────────────────────────────────────
+// ÉTAPE 1 — CODE
+// ──────────────────────────────────────────────
+async function validateCode() {
+  const input = document.getElementById('code-input');
+  const error = document.getElementById('code-error');
+  const code = input.value.trim().toUpperCase();
 
-  listWrapper.innerHTML = '';
+  if (!code) { error.textContent = 'Entrez un code de révision.'; return; }
 
-  if (users.length > 0) {
+  if (!decksConfig) {
+    try { decksConfig = await fetchDecksConfig(); }
+    catch { error.textContent = 'Impossible de charger la configuration.'; return; }
+  }
+
+  if (!decksConfig[code]) {
+    error.textContent = 'Code invalide. Vérifiez et réessayez.';
+    document.getElementById('deck-preview').style.display = 'none';
+    return;
+  }
+
+  error.textContent = '';
+  currentCode = code;
+  currentDeckConfig = decksConfig[code];
+
+  // Afficher preview
+  document.getElementById('deck-preview-title').textContent = currentDeckConfig.label;
+  document.getElementById('deck-preview-desc').textContent = currentDeckConfig.description || '';
+  document.getElementById('deck-preview').style.display = 'block';
+
+  // Aller à l'étape pseudo
+  setTimeout(() => goToPseudo(), 350);
+}
+
+document.getElementById('code-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') validateCode();
+});
+
+// live preview
+document.getElementById('code-input').addEventListener('input', async () => {
+  const code = document.getElementById('code-input').value.trim().toUpperCase();
+  if (!decksConfig) {
+    try { decksConfig = await fetchDecksConfig(); } catch { return; }
+  }
+  const preview = document.getElementById('deck-preview');
+  if (decksConfig && decksConfig[code]) {
+    document.getElementById('deck-preview-title').textContent = decksConfig[code].label;
+    document.getElementById('deck-preview-desc').textContent = decksConfig[code].description || '';
+    preview.style.display = 'block';
+    document.getElementById('code-error').textContent = '';
+  } else {
+    preview.style.display = 'none';
+  }
+});
+
+function backToCode() {
+  document.getElementById('screen-pseudo').style.display = 'none';
+  document.getElementById('screen-code').style.display = 'flex';
+}
+
+// ──────────────────────────────────────────────
+// ÉTAPE 2 — PSEUDO
+// ──────────────────────────────────────────────
+function goToPseudo() {
+  document.getElementById('screen-code').style.display = 'none';
+  document.getElementById('screen-pseudo').style.display = 'flex';
+  document.getElementById('pseudo-deck-name').textContent = currentDeckConfig.label;
+
+  renderPseudoList();
+  document.getElementById('pseudo-input').value = '';
+  document.getElementById('pseudo-error').textContent = '';
+}
+
+function renderPseudoList() {
+  const profiles = getProfilesForCode(currentCode);
+  const listEl = document.getElementById('pseudo-existing-list');
+  const divider = document.getElementById('pseudo-divider');
+  listEl.innerHTML = '';
+
+  if (profiles.length > 0) {
     const ul = document.createElement('div');
     ul.className = 'pseudo-list';
-    users.forEach(u => {
-      const progress = u.progress || {};
+    profiles.forEach(p => {
+      const progress = p.progress || {};
       const seen = Object.keys(progress).length;
-      const known = Object.values(progress).filter(p => p.knew).length;
+      const known = Object.values(progress).filter(x => x.knew).length;
       const btn = document.createElement('button');
       btn.className = 'pseudo-btn';
-      btn.innerHTML = `
-        <span class="pseudo-name">${escapeHTML(u.pseudo)}</span>
-        <span class="pseudo-stats">${seen} cartes vues · ${known} sues</span>
-      `;
-      btn.onclick = () => loginAs(u.pseudo);
+      btn.innerHTML = `<span class="pseudo-name">${escapeHTML(p.pseudo)}</span>
+                       <span class="pseudo-stats">${seen} vues · ${known} sues</span>`;
+      btn.onclick = () => loginAs(p.pseudo);
       ul.appendChild(btn);
     });
-    listWrapper.appendChild(ul);
+    listEl.appendChild(ul);
     divider.style.display = '';
   } else {
     divider.style.display = 'none';
@@ -1055,32 +1043,52 @@ function createAndLogin() {
   loginAs(pseudo);
 }
 
-function loginAs(pseudo) {
-  getUserData(pseudo);
+document.getElementById('pseudo-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createAndLogin();
+});
+
+async function loginAs(pseudo) {
+  getProfile(currentCode, pseudo);
   currentUser = pseudo;
-  document.getElementById('screen-auth').style.display = 'none';
+
+  // Charger les CSV
+  await loadDeckCSVs(currentDeckConfig);
+
+  // Remplir le select de decks
+  const sel = document.getElementById('select-deck');
+  sel.innerHTML = `<option value="all">Tous les decks</option>` +
+    currentDeckConfig.decks.map(d => `<option value="${d.id}">${d.label}</option>`).join('');
+
+  // Afficher l'app
+  document.getElementById('screen-pseudo').style.display = 'none';
   document.getElementById('screen-app').style.display = 'block';
+  document.getElementById('header-deck-label').textContent = currentDeckConfig.label;
   document.getElementById('user-pseudo-display').textContent = pseudo;
   document.getElementById('user-avatar').textContent = pseudo[0].toUpperCase();
+
   updateCardCount();
   renderProgress();
 }
 
 function logout() {
   currentUser = null;
+  currentCode = null;
+  currentDeckConfig = null;
+  allCards = {};
   document.getElementById('screen-app').style.display = 'none';
-  document.getElementById('screen-auth').style.display = 'flex';
-  document.getElementById('pseudo-input').value = '';
-  renderAuthScreen();
+  document.getElementById('screen-code').style.display = 'flex';
+  document.getElementById('code-input').value = '';
+  document.getElementById('deck-preview').style.display = 'none';
+  document.getElementById('code-error').textContent = '';
+  // Reset étude
+  document.getElementById('study-zone').classList.add('hidden');
+  document.getElementById('session-end').style.display = 'none';
+  document.getElementById('session-controls').style.display = 'block';
 }
 
-document.getElementById('pseudo-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') createAndLogin();
-});
-
-// ────────────────────────────────────────────────────────
-// NAVIGATION
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// NAVIGATION ONGLETS
+// ──────────────────────────────────────────────
 function switchTab(view, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -1089,23 +1097,20 @@ function switchTab(view, btn) {
   if (view === 'progress') renderProgress();
 }
 
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // SESSION
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 function getFilteredCards() {
-  const matiere = document.getElementById('select-matiere').value;
+  const deckId = document.getElementById('select-deck').value;
   const filter = document.getElementById('select-filter').value;
-  const progress = getProgress(currentUser);
+  const progress = getProgress(currentCode, currentUser);
 
-  let cards = matiere === 'all'
+  let cards = deckId === 'all'
     ? Object.values(allCards).flat()
-    : (allCards[matiere] || []);
+    : (allCards[deckId] || []);
 
-  if (filter === 'unknown') {
-    cards = cards.filter(c => !progress[c.id] || !progress[c.id].knew);
-  } else if (filter === 'known') {
-    cards = cards.filter(c => progress[c.id] && progress[c.id].knew);
-  }
+  if (filter === 'unknown') cards = cards.filter(c => !progress[c.id] || !progress[c.id].knew);
+  else if (filter === 'known') cards = cards.filter(c => progress[c.id] && progress[c.id].knew);
 
   return cards;
 }
@@ -1127,17 +1132,15 @@ function updateCardCount() {
   if (cards.length === 0) {
     label.textContent = 'Aucune carte dans cette sélection';
     btn.disabled = true;
-    btn.style.opacity = '.5';
   } else {
     label.textContent = `${cards.length} carte${cards.length > 1 ? 's' : ''} à réviser`;
     btn.disabled = false;
-    btn.style.opacity = '1';
   }
 }
 
 function startSession() {
   const cards = getFilteredCards();
-  if (cards.length === 0) return;
+  if (!cards.length) return;
 
   sessionCards = shuffle(cards);
   sessionIndex = 0;
@@ -1156,16 +1159,13 @@ function startSession() {
 
 function showCard() {
   if (sessionIndex >= sessionCards.length) { endSession(); return; }
-
   isFlipped = false;
   document.getElementById('flashcard').classList.remove('flipped');
   document.getElementById('card-actions').style.display = 'none';
-
   const card = sessionCards[sessionIndex];
   document.getElementById('card-index').textContent = sessionIndex + 1;
   document.getElementById('card-question').innerHTML = card.q;
   document.getElementById('card-answer').innerHTML = card.a;
-
   const pct = (sessionIndex / sessionCards.length) * 100;
   document.getElementById('study-progress-fill').style.width = pct + '%';
 }
@@ -1174,16 +1174,14 @@ function flipCard() {
   if (isFlipped) return;
   isFlipped = true;
   document.getElementById('flashcard').classList.add('flipped');
-  setTimeout(() => {
-    document.getElementById('card-actions').style.display = 'grid';
-  }, 250);
+  setTimeout(() => { document.getElementById('card-actions').style.display = 'grid'; }, 250);
 }
 
 function markCard(knew) {
   if (!isFlipped) { flipCard(); return; }
   const card = sessionCards[sessionIndex];
-  saveProgress(currentUser, card.id, knew);
-  if (knew) { sessionKnown++; } else { sessionUnknown++; }
+  saveProgress(currentCode, currentUser, card.id, knew);
+  if (knew) sessionKnown++; else sessionUnknown++;
   document.getElementById('session-known-count').textContent = `✓ ${sessionKnown}`;
   document.getElementById('session-unknown-count').textContent = `✗ ${sessionUnknown}`;
   sessionIndex++;
@@ -1194,39 +1192,29 @@ function endSession() {
   document.getElementById('study-zone').classList.add('hidden');
   document.getElementById('session-end').style.display = 'block';
   document.getElementById('session-controls').style.display = 'block';
-
   const total = sessionKnown + sessionUnknown;
   const pct = total > 0 ? Math.round((sessionKnown / total) * 100) : 0;
   document.getElementById('end-known').textContent = sessionKnown;
   document.getElementById('end-unknown').textContent = sessionUnknown;
   document.getElementById('end-pct').textContent = pct + '%';
-
-  let msg = '';
-  if (total === 0) msg = 'Aucune carte révisée.';
-  else if (pct === 100) msg = 'Parfait ! Tu maîtrises toutes ces cartes.';
-  else if (pct >= 80) msg = 'Très bien ! Continue comme ça.';
-  else if (pct >= 50) msg = 'Bon début, continue à travailler les cartes restantes.';
-  else msg = 'Courage, la régularité paie !';
-  document.getElementById('end-message').textContent = msg;
+  const msgs = ['Aucune carte révisée.', 'Courage, la régularité paie !', 'Bon début, continue !', 'Très bien ! Continue.', 'Parfait ! Tu maîtrises ces cartes.'];
+  document.getElementById('end-message').textContent = total === 0 ? msgs[0] : pct === 100 ? msgs[4] : pct >= 80 ? msgs[3] : pct >= 50 ? msgs[2] : msgs[1];
 }
 
-function resetToControls() {
-  document.getElementById('session-end').style.display = 'none';
-}
+function resetToControls() { document.getElementById('session-end').style.display = 'none'; }
 
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // PROGRESSION
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 function renderProgress() {
-  if (!currentUser) return;
-  const progress = getProgress(currentUser);
-  const totalCards = Object.values(allCards).flat().length;
+  if (!currentUser || !currentDeckConfig) return;
+  const progress = getProgress(currentCode, currentUser);
+  const allFlat = Object.values(allCards).flat();
+  const total = allFlat.length;
   const seen = Object.keys(progress).length;
   const known = Object.values(progress).filter(p => p.knew).length;
-  const unseen = totalCards - seen;
 
-  const globalEl = document.getElementById('global-stats');
-  globalEl.innerHTML = `
+  document.getElementById('global-stats').innerHTML = `
     <div class="stat-card">
       <div class="stat-value" style="color:var(--accent)">${known}</div>
       <div class="stat-label">Cartes sues</div>
@@ -1236,70 +1224,63 @@ function renderProgress() {
       <div class="stat-label">À retravailler</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" style="color:var(--text-3)">${unseen}</div>
+      <div class="stat-value" style="color:var(--text-3)">${total - seen}</div>
       <div class="stat-label">Pas encore vues</div>
     </div>
   `;
 
-  const matiereEl = document.getElementById('matiere-stats');
-  matiereEl.innerHTML = '';
+  const deckStatsEl = document.getElementById('deck-stats');
+  deckStatsEl.innerHTML = '';
 
-  Object.entries(MATIERES).forEach(([key, { label }]) => {
-    const cards = allCards[key] || [];
+  currentDeckConfig.decks.forEach(({ id, label }) => {
+    const cards = allCards[id] || [];
     const cardProgress = cards.map(c => progress[c.id]);
-    const matSeen = cardProgress.filter(Boolean).length;
-    const matKnown = cardProgress.filter(p => p && p.knew).length;
-    const matUnseen = cards.length - matSeen;
-    const pct = cards.length > 0 ? Math.round((matKnown / cards.length) * 100) : 0;
+    const dSeen = cardProgress.filter(Boolean).length;
+    const dKnown = cardProgress.filter(p => p && p.knew).length;
+    const dUnseen = cards.length - dSeen;
+    const pct = cards.length > 0 ? Math.round((dKnown / cards.length) * 100) : 0;
 
     const div = document.createElement('div');
-    div.className = 'matiere-section';
+    div.className = 'deck-section';
     div.innerHTML = `
-      <div class="matiere-header">
-        <span class="matiere-title">${label}</span>
-        <span class="matiere-count">${matKnown} / ${cards.length} sues (${pct}%)</span>
+      <div class="deck-section-header">
+        <span class="deck-section-title">${label}</span>
+        <span class="deck-section-count">${dKnown} / ${cards.length} (${pct}%)</span>
       </div>
-      <div class="matiere-bar">
-        <div class="matiere-bar-fill" style="width:${pct}%"></div>
-      </div>
-      <div class="matiere-detail">
-        <span class="detail-item"><span class="dot dot-green"></span>${matKnown} sues</span>
-        <span class="detail-item"><span class="dot dot-red"></span>${matSeen - matKnown} à revoir</span>
-        <span class="detail-item"><span class="dot dot-gray"></span>${matUnseen} pas vues</span>
+      <div class="deck-bar"><div class="deck-bar-fill" style="width:${pct}%"></div></div>
+      <div class="deck-detail">
+        <span class="detail-item"><span class="dot dot-green"></span>${dKnown} sues</span>
+        <span class="detail-item"><span class="dot dot-red"></span>${dSeen - dKnown} à revoir</span>
+        <span class="detail-item"><span class="dot dot-gray"></span>${dUnseen} pas vues</span>
       </div>
     `;
-    matiereEl.appendChild(div);
+    deckStatsEl.appendChild(div);
   });
 }
 
 function confirmReset() {
-  if (!confirm(`Réinitialiser toute la progression de "${currentUser}" ? Cette action est irréversible.`)) return;
-  resetProgress(currentUser);
+  if (!confirm(`Réinitialiser toute la progression de "${currentUser}" sur ce deck ?`)) return;
+  resetProgress(currentCode, currentUser);
   renderProgress();
   updateCardCount();
   showToast('Progression réinitialisée.');
 }
 
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // CLAVIER
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (!currentUser) return;
   if (document.getElementById('study-zone').classList.contains('hidden')) return;
-
-  if (e.key === ' ' || e.code === 'Space') {
-    e.preventDefault();
-    if (!isFlipped) flipCard();
-  } else if (e.key === 'ArrowRight') {
-    if (isFlipped) markCard(true);
-  } else if (e.key === 'ArrowLeft') {
-    if (isFlipped) markCard(false);
-  }
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); if (!isFlipped) flipCard(); }
+  else if (e.key === 'ArrowRight') { if (isFlipped) markCard(true); }
+  else if (e.key === 'ArrowLeft') { if (isFlipped) markCard(false); }
 });
 
-// ────────────────────────────────────────────────────────
-// TOAST
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// TOAST & UTILS
+// ──────────────────────────────────────────────
 function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
@@ -1308,21 +1289,18 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 4200);
 }
 
-// ────────────────────────────────────────────────────────
-// UTILS
-// ────────────────────────────────────────────────────────
-function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function escapeHTML(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // INIT
-// ────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 (async function init() {
-  renderAuthScreen();
   document.getElementById('view-study').style.display = 'block';
   document.getElementById('view-progress').style.display = 'none';
-  await loadAllCSV();
+  // Pré-charger decks.json en arrière-plan
+  try { decksConfig = await fetchDecksConfig(); } catch {}
 })();
 </script>
 </body>
